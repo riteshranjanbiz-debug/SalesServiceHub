@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.env
+
+# Pytest / Mypy
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Terraform state — never commit state files
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfvars        # contains project_id — keep local
+
+# GCP credentials
+*.json.credentials
+service-account-key.json
+*-sa-key.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Docker
+docker/*.tar
+
+# macOS
+.DS_Store

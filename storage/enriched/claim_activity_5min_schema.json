@@ -1,0 +1,11 @@
+[
+  { "name": "window_start",     "type": "TIMESTAMP", "mode": "REQUIRED" },
+  { "name": "window_end",       "type": "TIMESTAMP", "mode": "REQUIRED" },
+  { "name": "event_type",       "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "line_of_business", "type": "STRING",    "mode": "NULLABLE" },
+  { "name": "event_count",      "type": "INTEGER",   "mode": "REQUIRED" },
+  { "name": "total_reserves",   "type": "FLOAT",     "mode": "NULLABLE" },
+  { "name": "total_paid",       "type": "FLOAT",     "mode": "NULLABLE" },
+  { "name": "cat_event_count",  "type": "INTEGER",   "mode": "NULLABLE" },
+  { "name": "computed_at",      "type": "TIMESTAMP", "mode": "REQUIRED" }
+]

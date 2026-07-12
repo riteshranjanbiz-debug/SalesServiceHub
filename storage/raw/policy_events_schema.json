@@ -1,0 +1,55 @@
+[
+  { "name": "event_id",      "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "event_type",    "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "source_system", "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "domain",        "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "public_id",     "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "entity_type",   "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "timestamp",     "type": "TIMESTAMP", "mode": "REQUIRED" },
+  { "name": "source",        "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "session_id",    "type": "STRING",    "mode": "NULLABLE" },
+  {
+    "name": "payload", "type": "RECORD", "mode": "NULLABLE",
+    "fields": [
+      { "name": "policy_number",        "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "policy_type",          "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "account_number",       "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "line_of_business",     "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "effective_date",       "type": "DATE",    "mode": "NULLABLE" },
+      { "name": "expiration_date",      "type": "DATE",    "mode": "NULLABLE" },
+      { "name": "term_type",            "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "written_premium",      "type": "FLOAT",   "mode": "NULLABLE" },
+      { "name": "currency",             "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "state",                "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "underwriting_company", "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "producer_code",        "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "status",               "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "cancellation_reason",  "type": "STRING",  "mode": "NULLABLE" },
+      {
+        "name": "insured", "type": "RECORD", "mode": "NULLABLE",
+        "fields": [
+          { "name": "contact_public_id", "type": "STRING", "mode": "NULLABLE" },
+          { "name": "name",              "type": "STRING", "mode": "NULLABLE" },
+          { "name": "dob",               "type": "DATE",   "mode": "NULLABLE" }
+        ]
+      },
+      {
+        "name": "endorsement", "type": "RECORD", "mode": "NULLABLE",
+        "fields": [
+          { "name": "endorsement_number", "type": "STRING", "mode": "NULLABLE" },
+          { "name": "change_type",        "type": "STRING", "mode": "NULLABLE" },
+          { "name": "premium_change",     "type": "FLOAT",  "mode": "NULLABLE" }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "metadata", "type": "RECORD", "mode": "NULLABLE",
+    "fields": [
+      { "name": "schema_version", "type": "STRING", "mode": "NULLABLE" },
+      { "name": "environment",    "type": "STRING", "mode": "NULLABLE" },
+      { "name": "job_id",         "type": "STRING", "mode": "NULLABLE" }
+    ]
+  },
+  { "name": "ingested_at", "type": "TIMESTAMP", "mode": "REQUIRED" }
+]

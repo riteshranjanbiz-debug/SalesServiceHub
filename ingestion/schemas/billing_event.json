@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BillingCenterEvent",
+  "description": "Guidewire BillingCenter billing lifecycle event",
+  "type": "object",
+  "required": ["event_id", "event_type", "source_system", "domain", "public_id", "entity_type", "timestamp", "source"],
+  "properties": {
+    "event_id":      { "type": "string", "format": "uuid" },
+    "event_type":    { "type": "string", "enum": [
+      "invoice.generated",
+      "invoice.due",
+      "payment.received",
+      "payment.failed",
+      "payment.reversed",
+      "delinquency.opened",
+      "delinquency.closed",
+      "refund.issued",
+      "payment_plan.changed",
+      "policy.written_off"
+    ]},
+    "source_system": { "type": "string", "const": "guidewire_bc" },
+    "domain":        { "type": "string", "const": "billing" },
+    "public_id":     { "type": "string", "description": "e.g. bc:Account:9012" },
+    "entity_type":   { "type": "string", "enum": ["BillingAccount", "Invoice", "Payment", "Delinquency", "Refund"] },
+    "timestamp":     { "type": "string", "format": "date-time" },
+    "source":        { "type": "string", "enum": ["api", "batch", "payment_portal", "ivr", "ui"] },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "billing_account_number": { "type": "string" },
+        "policy_number":          { "type": "string" },
+        "invoice_number":         { "type": ["string", "null"] },
+        "due_date":               { "type": ["string", "null"], "format": "date" },
+        "amount_due":             { "type": "number" },
+        "amount_paid":            { "type": "number" },
+        "outstanding_balance":    { "type": "number" },
+        "currency":               { "type": "string" },
+        "payment_method":         { "type": ["string", "null"], "enum": [
+          "ACH", "CreditCard", "Check", "EFT", "MoneyOrder", null
+        ]},
+        "payment_plan":           { "type": "string", "enum": [
+          "Monthly", "Quarterly", "SemiAnnual", "Annual", "PayInFull"
+        ]},
+        "days_past_due":          { "type": "integer" },
+        "delinquency_reason":     { "type": ["string", "null"], "enum": [
+          "NSF", "CardDeclined", "CheckReturned", "MissedInstallment", null
+        ]},
+        "delinquency_workflow":   { "type": ["string", "null"], "enum": [
+          "CancellationWorkflow", "ReinstatementWorkflow", null
+        ]},
+        "failure_reason":         { "type": ["string", "null"] }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "schema_version": { "type": "string" },
+        "environment":    { "type": "string", "enum": ["dev", "staging", "prod"] },
+        "job_id":         { "type": ["string", "null"] }
+      }
+    }
+  }
+}

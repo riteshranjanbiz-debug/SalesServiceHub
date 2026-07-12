@@ -1,0 +1,54 @@
+[
+  { "name": "event_id",      "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "event_type",    "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "source_system", "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "domain",        "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "public_id",     "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "entity_type",   "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "timestamp",     "type": "TIMESTAMP", "mode": "REQUIRED" },
+  { "name": "source",        "type": "STRING",    "mode": "REQUIRED" },
+  {
+    "name": "payload", "type": "RECORD", "mode": "NULLABLE",
+    "fields": [
+      { "name": "claim_number",     "type": "STRING",    "mode": "NULLABLE" },
+      { "name": "policy_number",    "type": "STRING",    "mode": "NULLABLE" },
+      { "name": "line_of_business", "type": "STRING",    "mode": "NULLABLE" },
+      { "name": "loss_type",        "type": "STRING",    "mode": "NULLABLE" },
+      { "name": "loss_date",        "type": "DATE",      "mode": "NULLABLE" },
+      { "name": "reported_date",    "type": "DATE",      "mode": "NULLABLE" },
+      {
+        "name": "loss_location", "type": "RECORD", "mode": "NULLABLE",
+        "fields": [
+          { "name": "state", "type": "STRING", "mode": "NULLABLE" },
+          { "name": "zip",   "type": "STRING", "mode": "NULLABLE" }
+        ]
+      },
+      { "name": "coverage_type",      "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "assigned_adjuster",  "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "adjuster_team",      "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "reserve_amount",     "type": "FLOAT",   "mode": "NULLABLE" },
+      { "name": "paid_to_date",       "type": "FLOAT",   "mode": "NULLABLE" },
+      { "name": "status",             "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "catastrophe_code",   "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "subrogation_flag",   "type": "BOOLEAN", "mode": "NULLABLE" },
+      { "name": "litigation_flag",    "type": "BOOLEAN", "mode": "NULLABLE" },
+      {
+        "name": "payment", "type": "RECORD", "mode": "NULLABLE",
+        "fields": [
+          { "name": "payment_id",   "type": "STRING", "mode": "NULLABLE" },
+          { "name": "payment_type", "type": "STRING", "mode": "NULLABLE" },
+          { "name": "amount",       "type": "FLOAT",  "mode": "NULLABLE" },
+          { "name": "payee",        "type": "STRING", "mode": "NULLABLE" }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "metadata", "type": "RECORD", "mode": "NULLABLE",
+    "fields": [
+      { "name": "schema_version", "type": "STRING", "mode": "NULLABLE" },
+      { "name": "environment",    "type": "STRING", "mode": "NULLABLE" }
+    ]
+  },
+  { "name": "ingested_at", "type": "TIMESTAMP", "mode": "REQUIRED" }
+]

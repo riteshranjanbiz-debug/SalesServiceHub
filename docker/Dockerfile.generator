@@ -1,0 +1,13 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir google-cloud-pubsub
+
+COPY ingestion/ ./ingestion/
+
+ENV PYTHONUNBUFFERED=1
+
+ENTRYPOINT ["python", "ingestion/event_generator/generator.py"]
+CMD ["--rate", "5", "--duration", "86400", "--env", "prod"]

@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PolicyCenterEvent",
+  "description": "Guidewire PolicyCenter policy lifecycle event",
+  "type": "object",
+  "required": ["event_id", "event_type", "source_system", "domain", "public_id", "entity_type", "timestamp", "source"],
+  "properties": {
+    "event_id":      { "type": "string", "format": "uuid" },
+    "event_type":    { "type": "string", "enum": [
+      "policy.quoted",
+      "policy.bound",
+      "policy.endorsed",
+      "policy.renewed",
+      "policy.cancelled",
+      "policy.reinstated",
+      "policy.expired",
+      "policy.lapsed"
+    ]},
+    "source_system": { "type": "string", "const": "guidewire_pc" },
+    "domain":        { "type": "string", "const": "policy" },
+    "public_id":     { "type": "string", "description": "Guidewire public ID, e.g. pc:Policy:12345" },
+    "entity_type":   { "type": "string", "enum": ["Policy", "PolicyPeriod", "Account"] },
+    "timestamp":     { "type": "string", "format": "date-time" },
+    "source":        { "type": "string", "enum": ["ui", "api", "batch"] },
+    "session_id":    { "type": ["string", "null"] },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "policy_number":        { "type": "string" },
+        "policy_type":          { "type": "string", "enum": [
+          "PersonalAuto", "Homeowners", "CommercialPackage", "WorkersComp", "BusinessAuto", "UmbrellaPolicy"
+        ]},
+        "account_number":       { "type": "string" },
+        "line_of_business":     { "type": "string", "enum": [
+          "PersonalAutoLine", "HomeownersLine", "CommercialPropertyLine", "WCLine", "BusinessAutoLine", "UmbrellaLine"
+        ]},
+        "effective_date":       { "type": "string", "format": "date" },
+        "expiration_date":      { "type": "string", "format": "date" },
+        "term_type":            { "type": "string", "enum": ["Annual", "SemiAnnual", "Monthly", "ShortTerm"] },
+        "written_premium":      { "type": "number" },
+        "currency":             { "type": "string" },
+        "state":                { "type": "string", "description": "2-letter US state code" },
+        "underwriting_company": { "type": "string" },
+        "producer_code":        { "type": "string" },
+        "status":               { "type": "string", "enum": [
+          "Draft", "Quoted", "Bound", "InForce", "Cancelled", "Expired", "Lapsed", "Reinstated"
+        ]},
+        "insured": {
+          "type": "object",
+          "properties": {
+            "contact_public_id": { "type": "string" },
+            "name":              { "type": "string" },
+            "dob":               { "type": ["string", "null"] }
+          }
+        },
+        "cancellation_reason":  { "type": ["string", "null"], "enum": [
+          "NonPayment", "UnderwritingIssue", "InsuredRequest", "Fraud", null
+        ]},
+        "endorsement": {
+          "type": ["object", "null"],
+          "properties": {
+            "endorsement_number": { "type": "string" },
+            "change_type":        { "type": "string", "enum": [
+              "VehicleAdd", "VehicleRemove", "CoverageChange", "AddressChange", "DriverAdd", "DriverRemove"
+            ]},
+            "premium_change":     { "type": "number" }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "schema_version": { "type": "string" },
+        "environment":    { "type": "string", "enum": ["dev", "staging", "prod"] },
+        "job_id":         { "type": ["string", "null"] }
+      }
+    }
+  }
+}

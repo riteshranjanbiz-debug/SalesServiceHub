@@ -1,0 +1,11 @@
+[
+  { "name": "window_start",          "type": "TIMESTAMP", "mode": "REQUIRED" },
+  { "name": "window_end",            "type": "TIMESTAMP", "mode": "REQUIRED" },
+  { "name": "event_type",            "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "event_count",           "type": "INTEGER",   "mode": "REQUIRED" },
+  { "name": "total_amount_collected","type": "FLOAT",     "mode": "NULLABLE" },
+  { "name": "total_amount_due",      "type": "FLOAT",     "mode": "NULLABLE" },
+  { "name": "delinquency_count",     "type": "INTEGER",   "mode": "NULLABLE" },
+  { "name": "payment_failure_count", "type": "INTEGER",   "mode": "NULLABLE" },
+  { "name": "computed_at",           "type": "TIMESTAMP", "mode": "REQUIRED" }
+]

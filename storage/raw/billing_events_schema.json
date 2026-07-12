@@ -1,0 +1,38 @@
+[
+  { "name": "event_id",      "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "event_type",    "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "source_system", "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "domain",        "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "public_id",     "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "entity_type",   "type": "STRING",    "mode": "REQUIRED" },
+  { "name": "timestamp",     "type": "TIMESTAMP", "mode": "REQUIRED" },
+  { "name": "source",        "type": "STRING",    "mode": "REQUIRED" },
+  {
+    "name": "payload", "type": "RECORD", "mode": "NULLABLE",
+    "fields": [
+      { "name": "billing_account_number", "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "policy_number",          "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "invoice_number",         "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "due_date",               "type": "DATE",    "mode": "NULLABLE" },
+      { "name": "amount_due",             "type": "FLOAT",   "mode": "NULLABLE" },
+      { "name": "amount_paid",            "type": "FLOAT",   "mode": "NULLABLE" },
+      { "name": "outstanding_balance",    "type": "FLOAT",   "mode": "NULLABLE" },
+      { "name": "currency",               "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "payment_method",         "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "payment_plan",           "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "days_past_due",          "type": "INTEGER", "mode": "NULLABLE" },
+      { "name": "delinquency_reason",     "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "delinquency_workflow",   "type": "STRING",  "mode": "NULLABLE" },
+      { "name": "failure_reason",         "type": "STRING",  "mode": "NULLABLE" }
+    ]
+  },
+  {
+    "name": "metadata", "type": "RECORD", "mode": "NULLABLE",
+    "fields": [
+      { "name": "schema_version", "type": "STRING", "mode": "NULLABLE" },
+      { "name": "environment",    "type": "STRING", "mode": "NULLABLE" },
+      { "name": "job_id",         "type": "STRING", "mode": "NULLABLE" }
+    ]
+  },
+  { "name": "ingested_at", "type": "TIMESTAMP", "mode": "REQUIRED" }
+]

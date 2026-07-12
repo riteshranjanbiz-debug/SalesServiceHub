@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ClaimCenterEvent",
+  "description": "Guidewire ClaimCenter claims lifecycle event",
+  "type": "object",
+  "required": ["event_id", "event_type", "source_system", "domain", "public_id", "entity_type", "timestamp", "source"],
+  "properties": {
+    "event_id":      { "type": "string", "format": "uuid" },
+    "event_type":    { "type": "string", "enum": [
+      "claim.fnol",
+      "claim.assigned",
+      "claim.reserved",
+      "claim.coverage_verified",
+      "claim.payment_issued",
+      "claim.closed",
+      "claim.reopened",
+      "claim.escalated",
+      "claim.subrogation_opened",
+      "claim.litigation_flagged"
+    ]},
+    "source_system": { "type": "string", "const": "guidewire_cc" },
+    "domain":        { "type": "string", "const": "claim" },
+    "public_id":     { "type": "string", "description": "e.g. cc:Claim:67890" },
+    "entity_type":   { "type": "string", "enum": ["Claim", "Exposure", "Activity", "ClaimPayment"] },
+    "timestamp":     { "type": "string", "format": "date-time" },
+    "source":        { "type": "string", "enum": ["ui", "api", "fnol_portal", "batch"] },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "claim_number":     { "type": "string" },
+        "policy_number":    { "type": "string" },
+        "line_of_business": { "type": "string", "enum": [
+          "PersonalAutoLine", "HomeownersLine", "CommercialPropertyLine", "WCLine", "BusinessAutoLine", "UmbrellaLine"
+        ]},
+        "loss_type":        { "type": "string", "enum": [
+          "collision", "rollover", "fire", "theft", "vandalism",
+          "weather", "slip_fall", "bodily_injury", "property_damage", "glass"
+        ]},
+        "loss_date":        { "type": "string", "format": "date" },
+        "reported_date":    { "type": "string", "format": "date" },
+        "loss_location": {
+          "type": "object",
+          "properties": {
+            "state": { "type": "string" },
+            "zip":   { "type": "string" }
+          }
+        },
+        "coverage_type":      { "type": "string", "enum": [
+          "CollisionCov", "ComprehensiveCov", "LiabilityCov", "MedPayCov",
+          "UMCov", "UIMCov", "DwellingCov", "PersonalPropertyCov", "WorkersCompCov"
+        ]},
+        "assigned_adjuster":  { "type": ["string", "null"] },
+        "adjuster_team":      { "type": ["string", "null"] },
+        "reserve_amount":     { "type": "number" },
+        "paid_to_date":       { "type": "number" },
+        "status":             { "type": "string", "enum": ["New", "Open", "Closed", "Reopened"] },
+        "catastrophe_code":   { "type": ["string", "null"] },
+        "subrogation_flag":   { "type": "boolean" },
+        "litigation_flag":    { "type": "boolean" },
+        "payment": {
+          "type": ["object", "null"],
+          "properties": {
+            "payment_id":   { "type": "string" },
+            "payment_type": { "type": "string", "enum": ["IndemnityPayment", "ExpensePayment", "SubrogationRecovery"] },
+            "amount":       { "type": "number" },
+            "payee":        { "type": "string" }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "schema_version": { "type": "string" },
+        "environment":    { "type": "string", "enum": ["dev", "staging", "prod"] }
+      }
+    }
+  }
+}
