@@ -176,3 +176,9 @@ pytest
 
 - `terraform/envs/*/terraform.tfvars` and `backend.hcl` are gitignored — they hold real project/bucket names and are local-only (or generated at CD runtime).
 - The Cloud Run API is IAM-locked by default (`allow_public_api_access = false`). Add callers to `api_invokers` in your tfvars rather than making it public.
+
+## Further docs
+
+- [`docs/architecture.md`](docs/architecture.md) — why things are built this way (Beam, module/env split, IAM lockdown, WIF, image tagging), and what's intentionally not built yet.
+- [`docs/deployment.md`](docs/deployment.md) — the exact commands used to stand up `salesservicehub`, reusable to stand up prod or any new environment.
+- [`docs/runbook.md`](docs/runbook.md) — health checks, redeploy/rollback commands, and a table of every real bug hit while building this (with root cause and fix).
