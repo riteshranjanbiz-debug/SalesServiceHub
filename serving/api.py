@@ -21,10 +21,11 @@ Environment variables:
 """
 
 import os
+from pathlib import Path
 from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse
 
 try:
     from google.cloud import bigquery
@@ -37,6 +38,8 @@ app = FastAPI(
     version="1.0.0",
     description="Near real-time insurance data products from PolicyCenter, ClaimCenter, BillingCenter",
 )
+
+_DASHBOARD_HTML = Path(__file__).parent / "dashboard.html"
 
 PROJECT    = os.environ.get("GCP_PROJECT", "")
 BQ_LOC     = os.environ.get("BQ_LOCATION", "US")
@@ -66,6 +69,12 @@ def _table(dataset: str, table: str) -> str:
 @app.get("/health", tags=["ops"])
 def health():
     return {"status": "ok", "project": PROJECT}
+
+
+@app.get("/dashboard", tags=["ops"])
+def dashboard():
+    """Operations dashboard — reads the JSON endpoints below client-side."""
+    return FileResponse(_DASHBOARD_HTML, media_type="text/html")
 
 
 # ── PolicyCenter ───────────────────────────────────────────────────────────────

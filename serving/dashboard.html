@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SalesServiceHub — Insurance Operations Dashboard</title>
+<style>
+  :root {
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+
+    --series-1: #2a78d6; /* blue */
+    --series-2: #1baf7a; /* aqua */
+    --series-6: #e34948; /* red */
+
+    --status-good:     #0ca30c;
+    --status-warning:  #fab219;
+    --status-serious:  #ec835a;
+    --status-critical: #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+
+      --series-1: #3987e5;
+      --series-2: #199e70;
+      --series-6: #e66767;
+
+      --status-good:     #0ca30c;
+      --status-warning:  #fab219;
+      --status-serious:  #ec835a;
+      --status-critical: #d03b3b;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 24px;
+  }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 13px; margin: 0 0 24px; }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-tile {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .stat-label { font-size: 12px; color: var(--text-secondary); }
+  .stat-value { font-size: 28px; font-weight: 600; margin-top: 4px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+  }
+  .card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .card-title { font-size: 14px; font-weight: 600; }
+  .toggle-btn {
+    font-size: 12px; color: var(--text-secondary); background: none;
+    border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; cursor: pointer;
+  }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 10px; height: 2px; border-radius: 1px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--text-muted); font-weight: 500; font-size: 11px; text-transform: uppercase;
+       padding: 6px 8px; border-bottom: 1px solid var(--gridline); }
+  td { padding: 6px 8px; border-bottom: 1px solid var(--gridline); font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: none; }
+
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 2px 8px; border-radius: 999px; }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .badge-critical { color: var(--status-critical); background: color-mix(in srgb, var(--status-critical) 14%, transparent); }
+  .badge-high, .badge-serious { color: var(--status-serious); background: color-mix(in srgb, var(--status-serious) 14%, transparent); }
+  .badge-medium, .badge-warning { color: var(--status-warning); background: color-mix(in srgb, var(--status-warning) 22%, transparent); }
+  .badge-low, .badge-good { color: var(--status-good); background: color-mix(in srgb, var(--status-good) 14%, transparent); }
+
+  .tooltip {
+    position: fixed; pointer-events: none; background: var(--text-primary); color: var(--surface-1);
+    font-size: 12px; padding: 6px 9px; border-radius: 6px; opacity: 0; transition: opacity 0.1s;
+    z-index: 10; white-space: nowrap;
+  }
+  .tooltip .tt-value { font-weight: 600; }
+
+  .empty { color: var(--text-muted); font-size: 13px; padding: 20px 0; text-align: center; }
+  .bar-rect { transition: opacity 0.1s; }
+  .bar-rect:hover { opacity: 0.8; }
+  .filter-row { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; }
+  select, input {
+    font: inherit; font-size: 13px; background: var(--surface-1); color: var(--text-primary);
+    border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px;
+  }
+</style>
+</head>
+<body>
+  <h1>SalesServiceHub — Insurance Operations Dashboard</h1>
+  <p class="subtitle" id="subtitle">Loading…</p>
+
+  <div class="filter-row">
+    <label for="hours" style="font-size:13px; color:var(--text-secondary);">Lookback</label>
+    <select id="hours">
+      <option value="1">Last 1 hour</option>
+      <option value="6">Last 6 hours</option>
+      <option value="24" selected>Last 24 hours</option>
+    </select>
+  </div>
+
+  <div class="stat-row" id="stat-row"></div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Written premium by line of business</div>
+        <button class="toggle-btn" data-toggle="premium-lob">View as table</button>
+      </div>
+      <div id="premium-lob-chart"></div>
+      <div id="premium-lob-table" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Claims exposure — reserves vs paid</div>
+        <button class="toggle-btn" data-toggle="claims-exposure">View as table</button>
+      </div>
+      <div class="legend" id="claims-legend"></div>
+      <div id="claims-exposure-chart"></div>
+      <div id="claims-exposure-table" style="display:none"></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Billing collection vs failure rate</div>
+        <button class="toggle-btn" data-toggle="billing-rate">View as table</button>
+      </div>
+      <div class="legend" id="billing-legend"></div>
+      <div id="billing-rate-chart"></div>
+      <div id="billing-rate-table" style="display:none"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">Active alerts</div></div>
+      <div id="alerts-table"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns: 1fr;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Delinquency watchlist</div></div>
+      <div id="delinquency-table"><div class="empty">Loading…</div></div>
+    </div>
+  </div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(x, y, html) {
+  tooltip.innerHTML = '';
+  const strong = document.createElement('span');
+  strong.className = 'tt-value';
+  tooltip.appendChild(strong);
+  tooltip.appendChild(document.createElement('br'));
+  const label = document.createElement('span');
+  tooltip.appendChild(label);
+  strong.textContent = html.value;
+  label.textContent = html.label;
+  tooltip.style.left = (x + 12) + 'px';
+  tooltip.style.top = (y + 12) + 'px';
+  tooltip.style.opacity = '1';
+}
+function hideTooltip() { tooltip.style.opacity = '0'; }
+
+function fmtMoney(n) {
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return '$' + (n/1e3).toFixed(1) + 'K';
+  return '$' + Math.round(n).toLocaleString();
+}
+function fmtNum(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+  return Math.round(n).toLocaleString();
+}
+function fmtPct(n) { return (n * 100).toFixed(1) + '%'; }
+
+async function getJSON(path) {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(path + ' -> ' + res.status);
+  return res.json();
+}
+
+// ── Single-series bar chart (SVG) ──────────────────────────────────────────
+function barChart(container, data, { labelKey, valueKey, color, fmt }) {
+  container.innerHTML = '';
+  if (!data.length) { container.innerHTML = '<div class="empty">No data</div>'; return; }
+
+  const W = container.clientWidth || 480, H = 220, padL = 8, padR = 8, padT = 10, padB = 28;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const maxV = Math.max(...data.map(d => d[valueKey]), 1);
+  const n = data.length;
+  const slot = plotW / n;
+  const barW = Math.min(24, slot * 0.6);
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', '100%');
+  svg.setAttribute('height', H);
+
+  const baseline = document.createElementNS(svg.namespaceURI, 'line');
+  baseline.setAttribute('x1', padL); baseline.setAttribute('x2', W - padR);
+  baseline.setAttribute('y1', H - padB); baseline.setAttribute('y2', H - padB);
+  baseline.setAttribute('stroke', 'var(--baseline)'); baseline.setAttribute('stroke-width', '1');
+  svg.appendChild(baseline);
+
+  data.forEach((d, i) => {
+    const v = d[valueKey];
+    const barH = (v / maxV) * plotH;
+    const x = padL + i * slot + (slot - barW) / 2;
+    const y = H - padB - barH;
+
+    const rect = document.createElementNS(svg.namespaceURI, 'rect');
+    rect.setAttribute('class', 'bar-rect');
+    rect.setAttribute('x', x); rect.setAttribute('y', y);
+    rect.setAttribute('width', barW); rect.setAttribute('height', Math.max(barH, 1));
+    rect.setAttribute('rx', 4); rect.setAttribute('ry', 4);
+    rect.setAttribute('fill', color);
+    rect.addEventListener('pointermove', (e) => {
+      showTooltip(e.clientX, e.clientY, { value: fmt(v), label: String(d[labelKey]) });
+    });
+    rect.addEventListener('pointerleave', hideTooltip);
+    svg.appendChild(rect);
+
+    const label = document.createElementNS(svg.namespaceURI, 'text');
+    label.setAttribute('x', x + barW / 2); label.setAttribute('y', H - padB + 14);
+    label.setAttribute('text-anchor', 'middle'); label.setAttribute('font-size', '10');
+    label.setAttribute('fill', 'var(--text-muted)');
+    label.textContent = String(d[labelKey]).slice(0, 10);
+    svg.appendChild(label);
+  });
+
+  container.appendChild(svg);
+}
+
+// ── Grouped bar chart (2 series) ────────────────────────────────────────────
+function groupedBarChart(container, data, { labelKey, series, fmt }) {
+  container.innerHTML = '';
+  if (!data.length) { container.innerHTML = '<div class="empty">No data</div>'; return; }
+
+  const W = container.clientWidth || 480, H = 220, padL = 8, padR = 8, padT = 10, padB = 28;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const maxV = Math.max(...data.flatMap(d => series.map(s => d[s.key])), 1);
+  const n = data.length;
+  const slot = plotW / n;
+  const groupW = Math.min(48, slot * 0.7);
+  const barW = (groupW - 2) / series.length;
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', '100%'); svg.setAttribute('height', H);
+
+  const baseline = document.createElementNS(svg.namespaceURI, 'line');
+  baseline.setAttribute('x1', padL); baseline.setAttribute('x2', W - padR);
+  baseline.setAttribute('y1', H - padB); baseline.setAttribute('y2', H - padB);
+  baseline.setAttribute('stroke', 'var(--baseline)'); baseline.setAttribute('stroke-width', '1');
+  svg.appendChild(baseline);
+
+  data.forEach((d, i) => {
+    const groupX = padL + i * slot + (slot - groupW) / 2;
+    series.forEach((s, si) => {
+      const v = d[s.key];
+      const barH = (v / maxV) * plotH;
+      const x = groupX + si * (barW + 2);
+      const y = H - padB - barH;
+
+      const rect = document.createElementNS(svg.namespaceURI, 'rect');
+      rect.setAttribute('class', 'bar-rect');
+      rect.setAttribute('x', x); rect.setAttribute('y', y);
+      rect.setAttribute('width', barW); rect.setAttribute('height', Math.max(barH, 1));
+      rect.setAttribute('rx', 4); rect.setAttribute('ry', 4);
+      rect.setAttribute('fill', s.color);
+      rect.addEventListener('pointermove', (e) => {
+        showTooltip(e.clientX, e.clientY, { value: fmt(v), label: `${d[labelKey]} — ${s.label}` });
+      });
+      rect.addEventListener('pointerleave', hideTooltip);
+      svg.appendChild(rect);
+    });
+
+    const label = document.createElementNS(svg.namespaceURI, 'text');
+    label.setAttribute('x', groupX + groupW / 2); label.setAttribute('y', H - padB + 14);
+    label.setAttribute('text-anchor', 'middle'); label.setAttribute('font-size', '10');
+    label.setAttribute('fill', 'var(--text-muted)');
+    label.textContent = String(d[labelKey]).slice(0, 10);
+    svg.appendChild(label);
+  });
+
+  container.appendChild(svg);
+}
+
+// ── Multi-series line chart with crosshair ─────────────────────────────────
+function lineChart(container, data, { xKey, series, fmt }) {
+  container.innerHTML = '';
+  if (!data.length) { container.innerHTML = '<div class="empty">No data</div>'; return; }
+
+  const W = container.clientWidth || 480, H = 220, padL = 8, padR = 8, padT = 10, padB = 24;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const n = data.length;
+  const maxV = Math.max(...data.flatMap(d => series.map(s => d[s.key])), 0.01);
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', '100%'); svg.setAttribute('height', H);
+
+  const xFor = i => padL + (n === 1 ? plotW / 2 : (i / (n - 1)) * plotW);
+  const yFor = v => padT + plotH - (v / maxV) * plotH;
+
+  series.forEach(s => {
+    const path = document.createElementNS(svg.namespaceURI, 'path');
+    const d = data.map((row, i) => `${i === 0 ? 'M' : 'L'} ${xFor(i)} ${yFor(row[s.key])}`).join(' ');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', s.color);
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-linejoin', 'round');
+    path.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(path);
+
+    data.forEach((row, i) => {
+      const dot = document.createElementNS(svg.namespaceURI, 'circle');
+      dot.setAttribute('cx', xFor(i)); dot.setAttribute('cy', yFor(row[s.key]));
+      dot.setAttribute('r', 4); dot.setAttribute('fill', s.color);
+      dot.setAttribute('stroke', 'var(--surface-1)'); dot.setAttribute('stroke-width', '2');
+      const hit = document.createElementNS(svg.namespaceURI, 'circle');
+      hit.setAttribute('cx', xFor(i)); hit.setAttribute('cy', yFor(row[s.key]));
+      hit.setAttribute('r', 12); hit.setAttribute('fill', 'transparent');
+      hit.addEventListener('pointermove', (e) => {
+        showTooltip(e.clientX, e.clientY, { value: fmt(row[s.key]), label: `${s.label} — ${row[xKey]}` });
+      });
+      hit.addEventListener('pointerleave', hideTooltip);
+      svg.appendChild(dot);
+      svg.appendChild(hit);
+    });
+  });
+
+  container.appendChild(svg);
+}
+
+function renderLegend(container, items) {
+  container.innerHTML = '';
+  items.forEach(it => {
+    const el = document.createElement('div');
+    el.className = 'legend-item';
+    const sw = document.createElement('span');
+    sw.className = 'legend-swatch';
+    sw.style.background = it.color;
+    const txt = document.createElement('span');
+    txt.textContent = it.label;
+    el.appendChild(sw); el.appendChild(txt);
+    container.appendChild(el);
+  });
+}
+
+function renderTable(container, rows, columns) {
+  container.innerHTML = '';
+  if (!rows.length) { container.innerHTML = '<div class="empty">No data in this window</div>'; return; }
+  const table = document.createElement('table');
+  const thead = document.createElement('thead');
+  const trh = document.createElement('tr');
+  columns.forEach(c => {
+    const th = document.createElement('th');
+    th.textContent = c.label;
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  rows.forEach(row => {
+    const tr = document.createElement('tr');
+    columns.forEach(c => {
+      const td = document.createElement('td');
+      if (c.render) { c.render(td, row); }
+      else { td.textContent = row[c.key] ?? '—'; }
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+function severityBadge(td, row, key) {
+  const raw = (row[key] || '').toLowerCase();
+  // normalize both "critical"/"high"/"medium"/"low" and "criticalrisk"/"highrisk"/...
+  let cls = 'low';
+  if (raw.startsWith('critical')) cls = 'critical';
+  else if (raw.startsWith('high') || raw.startsWith('serious')) cls = 'high';
+  else if (raw.startsWith('medium') || raw.startsWith('warning')) cls = 'medium';
+  const span = document.createElement('span');
+  span.className = 'badge badge-' + cls;
+  span.textContent = row[key] ?? '—';
+  td.appendChild(span);
+}
+
+function groupSum(rows, groupKey, valueKeys) {
+  const out = {};
+  rows.forEach(r => {
+    const k = r[groupKey] ?? 'Unknown';
+    if (!out[k]) { out[k] = { [groupKey]: k }; valueKeys.forEach(vk => out[k][vk] = 0); }
+    valueKeys.forEach(vk => out[k][vk] += (r[vk] || 0));
+  });
+  return Object.values(out);
+}
+
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.toggle;
+    const chartEl = document.getElementById(id + '-chart');
+    const tableEl = document.getElementById(id + '-table');
+    const showingChart = chartEl.style.display !== 'none';
+    chartEl.style.display = showingChart ? 'none' : '';
+    tableEl.style.display = showingChart ? '' : 'none';
+    btn.textContent = showingChart ? 'View as chart' : 'View as table';
+  });
+});
+
+async function load() {
+  const hours = document.getElementById('hours').value;
+  document.getElementById('subtitle').textContent =
+    'Live from BigQuery — window: last ' + hours + 'h · refreshed ' + new Date().toLocaleTimeString();
+
+  const [policies, perf, claims, exposure, billing, delinq, alerts] = await Promise.all([
+    getJSON('/policies/active?limit=500'),
+    getJSON('/policies/performance?hours=' + hours),
+    getJSON('/claims/open?limit=500'),
+    getJSON('/claims/exposure?hours=' + hours),
+    getJSON('/billing/health?hours=' + hours),
+    getJSON('/billing/delinquencies?limit=25'),
+    getJSON('/alerts?hours=' + hours + '&limit=25'),
+  ]);
+
+  // Stat tiles
+  const totalPremium = perf.reduce((a, r) => a + (r.total_written_premium || 0), 0);
+  const totalReserves = exposure.reduce((a, r) => a + (r.total_reserves || 0), 0);
+  const latestBilling = billing[0] || {};
+  const stats = [
+    { label: 'Active policies', value: fmtNum(policies.length) },
+    { label: 'Written premium (' + hours + 'h)', value: fmtMoney(totalPremium) },
+    { label: 'Claims reserve exposure', value: fmtMoney(totalReserves) },
+    { label: 'Collection rate (latest)', value: latestBilling.collection_rate != null ? fmtPct(latestBilling.collection_rate) : '—' },
+  ];
+  const statRow = document.getElementById('stat-row');
+  statRow.innerHTML = '';
+  stats.forEach(s => {
+    const tile = document.createElement('div');
+    tile.className = 'stat-tile';
+    tile.innerHTML = `<div class="stat-label"></div><div class="stat-value"></div>`;
+    tile.querySelector('.stat-label').textContent = s.label;
+    tile.querySelector('.stat-value').textContent = s.value;
+    statRow.appendChild(tile);
+  });
+
+  // Premium by LOB
+  const byLob = groupSum(perf, 'line_of_business', ['total_written_premium']);
+  barChart(document.getElementById('premium-lob-chart'), byLob,
+    { labelKey: 'line_of_business', valueKey: 'total_written_premium', color: 'var(--series-1)', fmt: fmtMoney });
+  renderTable(document.getElementById('premium-lob-table'), byLob, [
+    { key: 'line_of_business', label: 'Line of business' },
+    { key: 'total_written_premium', label: 'Written premium', render: (td, r) => td.textContent = fmtMoney(r.total_written_premium) },
+  ]);
+
+  // Claims exposure grouped
+  const exposureByLob = groupSum(exposure, 'line_of_business', ['total_reserves', 'total_paid']);
+  renderLegend(document.getElementById('claims-legend'), [
+    { color: 'var(--series-1)', label: 'Total reserves' },
+    { color: 'var(--series-2)', label: 'Total paid' },
+  ]);
+  groupedBarChart(document.getElementById('claims-exposure-chart'), exposureByLob, {
+    labelKey: 'line_of_business',
+    series: [
+      { key: 'total_reserves', color: 'var(--series-1)', label: 'Total reserves' },
+      { key: 'total_paid', color: 'var(--series-2)', label: 'Total paid' },
+    ],
+    fmt: fmtMoney,
+  });
+  renderTable(document.getElementById('claims-exposure-table'), exposureByLob, [
+    { key: 'line_of_business', label: 'Line of business' },
+    { key: 'total_reserves', label: 'Total reserves', render: (td, r) => td.textContent = fmtMoney(r.total_reserves) },
+    { key: 'total_paid', label: 'Total paid', render: (td, r) => td.textContent = fmtMoney(r.total_paid) },
+  ]);
+
+  // Billing rate over time
+  const billingSorted = [...billing].reverse();
+  const billingRows = billingSorted.map(r => ({
+    window: new Date(r.window_start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    collection_rate: r.collection_rate || 0,
+    failure_rate: r.failure_rate || 0,
+  }));
+  renderLegend(document.getElementById('billing-legend'), [
+    { color: 'var(--series-1)', label: 'Collection rate' },
+    { color: 'var(--series-6)', label: 'Failure rate' },
+  ]);
+  lineChart(document.getElementById('billing-rate-chart'), billingRows, {
+    xKey: 'window',
+    series: [
+      { key: 'collection_rate', color: 'var(--series-1)', label: 'Collection rate' },
+      { key: 'failure_rate', color: 'var(--series-6)', label: 'Failure rate' },
+    ],
+    fmt: fmtPct,
+  });
+  renderTable(document.getElementById('billing-rate-table'), billingRows, [
+    { key: 'window', label: 'Window' },
+    { key: 'collection_rate', label: 'Collection rate', render: (td, r) => td.textContent = fmtPct(r.collection_rate) },
+    { key: 'failure_rate', label: 'Failure rate', render: (td, r) => td.textContent = fmtPct(r.failure_rate) },
+  ]);
+
+  // Alerts table
+  renderTable(document.getElementById('alerts-table'), alerts, [
+    { key: 'severity', label: 'Severity', render: (td, r) => severityBadge(td, r, 'severity') },
+    { key: 'domain', label: 'Domain' },
+    { key: 'alert_type', label: 'Alert' },
+    { key: 'metric_value', label: 'Value', render: (td, r) => td.textContent = (r.metric_value ?? 0).toFixed(2) },
+    { key: 'threshold', label: 'Threshold', render: (td, r) => td.textContent = (r.threshold ?? 0).toFixed(2) },
+    { key: 'triggered_at', label: 'Triggered', render: (td, r) => td.textContent = new Date(r.triggered_at).toLocaleString() },
+  ]);
+
+  // Delinquency table
+  renderTable(document.getElementById('delinquency-table'), delinq, [
+    { key: 'risk_tier', label: 'Risk', render: (td, r) => severityBadge(td, r, 'risk_tier') },
+    { key: 'billing_account_number', label: 'Account' },
+    { key: 'policy_number', label: 'Policy' },
+    { key: 'days_past_due', label: 'Days past due' },
+    { key: 'outstanding_balance', label: 'Balance', render: (td, r) => td.textContent = fmtMoney(r.outstanding_balance || 0) },
+    { key: 'delinquency_reason', label: 'Reason' },
+  ]);
+}
+
+document.getElementById('hours').addEventListener('change', () => load().catch(console.error));
+load().catch(err => {
+  document.getElementById('subtitle').textContent = 'Failed to load: ' + err.message;
+  console.error(err);
+});
+</script>
+</body>
+</html>
