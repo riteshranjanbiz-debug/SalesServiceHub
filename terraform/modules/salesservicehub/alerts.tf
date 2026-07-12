@@ -1,10 +1,10 @@
 # ── Alerts Pub/Sub topic ───────────────────────────────────────────────────────
 
 resource "google_pubsub_topic" "insurance_alerts" {
-  name    = "insurance-alerts"
-  project = var.project_id
+  name                       = "insurance-alerts"
+  project                    = var.project_id
   message_retention_duration = "86400s"
-  labels  = { env = var.env, purpose = "alerts" }
+  labels                     = { env = var.env, purpose = "alerts" }
 }
 
 resource "google_pubsub_subscription" "insurance_alerts_push" {
