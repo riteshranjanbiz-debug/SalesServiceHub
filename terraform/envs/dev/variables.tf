@@ -31,3 +31,13 @@ variable "api_invokers" {
   type        = list(string)
   default     = []
 }
+
+variable "api_image" {
+  description = "Full image ref for the API Cloud Run service. Pass a digest/SHA tag (not :latest) so Terraform detects the change and deploys a new revision."
+  type        = string
+  default     = null
+}
+
+locals {
+  api_image = coalesce(var.api_image, "gcr.io/${var.project_id}/ssh-insurance-api:latest")
+}

@@ -27,4 +27,5 @@ module "salesservicehub" {
   dataflow_temp_bucket    = var.dataflow_temp_bucket
   allow_public_api_access = var.allow_public_api_access
   api_invokers            = var.api_invokers
+  api_image               = var.api_image
 }

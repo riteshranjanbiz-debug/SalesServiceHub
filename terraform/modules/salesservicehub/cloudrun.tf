@@ -14,7 +14,7 @@ resource "google_cloud_run_v2_service" "api" {
     }
 
     containers {
-      image = "gcr.io/${var.project_id}/ssh-insurance-api:latest"
+      image = local.api_image
 
       ports {
         container_port = 8080
