@@ -16,12 +16,13 @@ venv/
 .coverage
 htmlcov/
 
-# Terraform state — never commit state files
-terraform/*.tfstate
-terraform/*.tfstate.backup
-terraform/.terraform/
-terraform/.terraform.lock.hcl
-terraform/terraform.tfvars        # contains project_id — keep local
+# Terraform state and per-env local config — never commit state or real project/bucket names
+terraform/**/*.tfstate
+terraform/**/*.tfstate.backup
+terraform/**/.terraform/
+terraform/**/.terraform.lock.hcl
+terraform/envs/*/terraform.tfvars
+terraform/envs/*/backend.hcl
 
 # GCP credentials
 *.json.credentials

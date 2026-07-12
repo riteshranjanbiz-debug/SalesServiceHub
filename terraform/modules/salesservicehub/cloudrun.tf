@@ -64,14 +64,27 @@ resource "google_project_iam_member" "api_bq_job_user" {
   member  = "serviceAccount:${google_service_account.api_sa.email}"
 }
 
-# ── Public invoker (remove for internal-only deployment) ──────────────────────
+# ── Invoker access ──────────────────────────────────────────────────────────────
+# Public access is opt-in only (set allow_public_api_access = true), e.g. for a
+# throwaway dev/demo environment. In prod, leave it false and list explicit
+# api_invokers instead — callers authenticate with an IAM identity token.
 
 resource "google_cloud_run_v2_service_iam_member" "api_public" {
+  count    = var.allow_public_api_access ? 1 : 0
   project  = var.project_id
   location = var.region
   name     = google_cloud_run_v2_service.api.name
   role     = "roles/run.invoker"
   member   = "allUsers"
+}
+
+resource "google_cloud_run_v2_service_iam_member" "api_invokers" {
+  for_each = toset(var.api_invokers)
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.api.name
+  role     = "roles/run.invoker"
+  member   = each.value
 }
 
 # ── Output ─────────────────────────────────────────────────────────────────────

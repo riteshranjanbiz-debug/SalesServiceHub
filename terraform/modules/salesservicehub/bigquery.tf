@@ -39,7 +39,7 @@ resource "google_bigquery_table" "raw_policy_events" {
   project             = var.project_id
   deletion_protection = false
 
-  schema = file("${path.module}/../storage/raw/policy_events_schema.json")
+  schema = file("${path.module}/../../../storage/raw/policy_events_schema.json")
 
   time_partitioning {
     type  = "DAY"
@@ -61,7 +61,7 @@ resource "google_bigquery_table" "raw_claim_events" {
   project             = var.project_id
   deletion_protection = false
 
-  schema = file("${path.module}/../storage/raw/claim_events_schema.json")
+  schema = file("${path.module}/../../../storage/raw/claim_events_schema.json")
 
   time_partitioning {
     type  = "DAY"
@@ -83,7 +83,7 @@ resource "google_bigquery_table" "raw_billing_events" {
   project             = var.project_id
   deletion_protection = false
 
-  schema = file("${path.module}/../storage/raw/billing_events_schema.json")
+  schema = file("${path.module}/../../../storage/raw/billing_events_schema.json")
 
   time_partitioning {
     type  = "DAY"
@@ -105,7 +105,7 @@ resource "google_bigquery_table" "enriched_policy_summary_5min" {
   project             = var.project_id
   deletion_protection = false
 
-  schema = file("${path.module}/../storage/enriched/policy_summary_5min_schema.json")
+  schema = file("${path.module}/../../../storage/enriched/policy_summary_5min_schema.json")
 
   time_partitioning {
     type  = "DAY"
@@ -121,7 +121,7 @@ resource "google_bigquery_table" "enriched_claim_activity_5min" {
   project             = var.project_id
   deletion_protection = false
 
-  schema = file("${path.module}/../storage/enriched/claim_activity_5min_schema.json")
+  schema = file("${path.module}/../../../storage/enriched/claim_activity_5min_schema.json")
 
   time_partitioning {
     type  = "DAY"
@@ -137,7 +137,7 @@ resource "google_bigquery_table" "enriched_billing_summary_5min" {
   project             = var.project_id
   deletion_protection = false
 
-  schema = file("${path.module}/../storage/enriched/billing_summary_5min_schema.json")
+  schema = file("${path.module}/../../../storage/enriched/billing_summary_5min_schema.json")
 
   time_partitioning {
     type  = "DAY"

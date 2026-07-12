@@ -26,7 +26,7 @@ resource "google_bigquery_table" "raw_alerts" {
   project             = var.project_id
   deletion_protection = false
 
-  schema = file("${path.module}/../storage/raw/alerts_schema.json")
+  schema = file("${path.module}/../../../storage/raw/alerts_schema.json")
 
   time_partitioning {
     type  = "DAY"
@@ -48,7 +48,7 @@ resource "google_bigquery_table" "dp_active_alerts" {
 
   view {
     query = templatefile(
-      "${path.module}/../storage/data_products/active_alerts.sql",
+      "${path.module}/../../../storage/data_products/active_alerts.sql",
       { project_id = var.project_id }
     )
     use_legacy_sql = false

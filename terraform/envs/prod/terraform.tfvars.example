@@ -1,0 +1,10 @@
+project_id           = "<prod-gcp-project-id>"
+region               = "us-central1"
+env                  = "prod"
+dataflow_temp_bucket = "<prod-dataflow-temp-bucket-name>"
+
+# Keep false in prod. Authenticate callers via IAM instead of public access.
+allow_public_api_access = false
+api_invokers = [
+  # "serviceAccount:some-consumer@some-project.iam.gserviceaccount.com",
+]

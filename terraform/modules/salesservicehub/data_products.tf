@@ -10,7 +10,7 @@ resource "google_bigquery_table" "dp_policy_performance" {
 
   view {
     query = templatefile(
-      "${path.module}/../storage/data_products/policy_performance.sql",
+      "${path.module}/../../../storage/data_products/policy_performance.sql",
       { project_id = var.project_id }
     )
     use_legacy_sql = false
@@ -29,7 +29,7 @@ resource "google_bigquery_table" "dp_active_policy_snapshot" {
 
   view {
     query = templatefile(
-      "${path.module}/../storage/data_products/active_policy_snapshot.sql",
+      "${path.module}/../../../storage/data_products/active_policy_snapshot.sql",
       { project_id = var.project_id }
     )
     use_legacy_sql = false
@@ -52,7 +52,7 @@ resource "google_bigquery_table" "dp_claims_exposure" {
 
   view {
     query = templatefile(
-      "${path.module}/../storage/data_products/claims_exposure.sql",
+      "${path.module}/../../../storage/data_products/claims_exposure.sql",
       { project_id = var.project_id }
     )
     use_legacy_sql = false
@@ -71,7 +71,7 @@ resource "google_bigquery_table" "dp_open_claims_summary" {
 
   view {
     query = templatefile(
-      "${path.module}/../storage/data_products/open_claims_summary.sql",
+      "${path.module}/../../../storage/data_products/open_claims_summary.sql",
       { project_id = var.project_id }
     )
     use_legacy_sql = false
@@ -94,7 +94,7 @@ resource "google_bigquery_table" "dp_billing_health" {
 
   view {
     query = templatefile(
-      "${path.module}/../storage/data_products/billing_health.sql",
+      "${path.module}/../../../storage/data_products/billing_health.sql",
       { project_id = var.project_id }
     )
     use_legacy_sql = false
@@ -113,7 +113,7 @@ resource "google_bigquery_table" "dp_delinquency_watchlist" {
 
   view {
     query = templatefile(
-      "${path.module}/../storage/data_products/delinquency_watchlist.sql",
+      "${path.module}/../../../storage/data_products/delinquency_watchlist.sql",
       { project_id = var.project_id }
     )
     use_legacy_sql = false
