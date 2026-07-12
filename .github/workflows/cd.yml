@@ -1,0 +1,71 @@
+name: CD (dev)
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write # required for WIF
+
+concurrency:
+  group: cd-dev
+  cancel-in-progress: false
+
+jobs:
+  deploy-dev:
+    name: Deploy to dev
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOYER_SA }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for gcr.io
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build and push API image
+        run: |
+          IMAGE="gcr.io/${{ vars.GCP_PROJECT_ID }}/ssh-insurance-api:${{ github.sha }}"
+          LATEST="gcr.io/${{ vars.GCP_PROJECT_ID }}/ssh-insurance-api:latest"
+          docker build -f docker/Dockerfile.api -t "$IMAGE" -t "$LATEST" .
+          docker push "$IMAGE"
+          docker push "$LATEST"
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.0"
+
+      # backend.hcl and terraform.tfvars are gitignored (hold project-specific
+      # values); generate them here from repo variables (non-secret config).
+      - name: Write backend + tfvars
+        working-directory: terraform/envs/dev
+        run: |
+          cat > backend.hcl <<EOF
+          bucket = "${{ vars.GCP_TFSTATE_BUCKET }}"
+          prefix = "salesservicehub/dev"
+          EOF
+
+          cat > terraform.tfvars <<EOF
+          project_id           = "${{ vars.GCP_PROJECT_ID }}"
+          region               = "${{ vars.GCP_REGION }}"
+          env                  = "dev"
+          dataflow_temp_bucket = "${{ vars.GCP_DATAFLOW_TEMP_BUCKET }}"
+          allow_public_api_access = false
+          api_invokers = ["${{ vars.GCP_API_INVOKER }}"]
+          EOF
+
+      - name: Terraform init
+        working-directory: terraform/envs/dev
+        run: terraform init -backend-config=backend.hcl
+
+      - name: Terraform apply
+        working-directory: terraform/envs/dev
+        run: terraform apply -auto-approve -var-file=terraform.tfvars
