@@ -46,7 +46,7 @@ resource "google_bigquery_table" "raw_policy_events" {
     field = "timestamp"
   }
 
-  clustering = ["event_type", "payload.line_of_business", "payload.state"]
+  clustering = ["event_type", "domain", "entity_type"]
 
   labels = { env = var.env, domain = "policy", source_system = "guidewire_pc" }
 }
@@ -68,7 +68,7 @@ resource "google_bigquery_table" "raw_claim_events" {
     field = "timestamp"
   }
 
-  clustering = ["event_type", "payload.line_of_business", "payload.status"]
+  clustering = ["event_type", "domain", "entity_type"]
 
   labels = { env = var.env, domain = "claim", source_system = "guidewire_cc" }
 }
@@ -90,7 +90,7 @@ resource "google_bigquery_table" "raw_billing_events" {
     field = "timestamp"
   }
 
-  clustering = ["event_type", "payload.payment_plan", "payload.delinquency_reason"]
+  clustering = ["event_type", "domain", "entity_type"]
 
   labels = { env = var.env, domain = "billing", source_system = "guidewire_bc" }
 }
