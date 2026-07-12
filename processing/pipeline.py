@@ -36,6 +36,7 @@ try:
     from apache_beam.io.gcp.bigquery import BigQueryDisposition, WriteToBigQuery
     from apache_beam.options.pipeline_options import PipelineOptions, StandardOptions
     from apache_beam.transforms.window import FixedWindows
+    _TaggedOutput = beam.pvalue.TaggedOutput
     _BEAM_AVAILABLE = True
 except ImportError:
     _BEAM_AVAILABLE = False
